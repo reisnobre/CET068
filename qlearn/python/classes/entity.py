@@ -17,14 +17,14 @@ class Entity:
 
     def action(self, choice):
         """Dado uma escolha, mova o individuo através do método move."""
-        if choice == 0:
-            self.move(x=1, y=1)
-        elif choice == 1:
-            self.move(x=-1, y=-1)
-        elif choice == 2:
-            self.move(x=-1, y=1)
-        elif choice == 3:
-            self.move(x=1, y=-1)
+        if choice == 0:  # up
+            self.move(x=0, y=1)
+        elif choice == 1:  # down
+            self.move(x=0, y=-1)
+        elif choice == 2:  # left
+            self.move(x=-1, y=0)
+        elif choice == 3:  # right
+            self.move(x=1, y=0)
 
     def move(self, x=False, y=False):
         """Dado um x e y mova o individuo, se algo não for informado, mova aleatóriamente."""
@@ -42,7 +42,10 @@ class Entity:
             self.x = 0
         elif self.x > self.board_size - 1:
             self.x = self.board_size - 1
+
         if self.y < 0:
             self.y = 0
         elif self.y > self.board_size - 1:
             self.y = self.board_size - 1
+
+        print(self.x, self.y)

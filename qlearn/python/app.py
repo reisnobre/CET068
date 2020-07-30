@@ -1,6 +1,7 @@
 """."""
 from classes.entity import Entity
 from classes.qtable import QTable
+
 import numpy as np  # for array stuff and random
 from PIL import Image  # for creating visual of our env
 import cv2  # for showing our visual live
@@ -17,11 +18,11 @@ MOVE_PENALTY = 1  # feel free to tinker with these!
 ENEMY_PENALTY = 300  # feel free to tinker with these!
 DOOR_REWARD = 25  # feel free to tinker with these!
 
-epsilon = 0.5  # randomness
+epsilon = 0  # randomness
 EPS_DECAY = 0.9999  # Every episode will be epsilon*EPS_DECAY
-SHOW_EVERY = 2000  # how often to play through env visually.
+SHOW_EVERY = 5000  # how often to play through env visually.
 
-start_q_table = 'qtable-1579431776.pickle'  # if we have a pickled Q table, we'll put the filename of it here.
+start_q_table = 'qtable-1579619956.pickle'  # if we have a pickled Q table, we'll put the filename of it here.
 
 PLAYER_N = 1  # player key in dict
 DOOR_N = 2  # door key in dict
@@ -33,8 +34,10 @@ d = {1: (255, 175, 0),  # blueish color
      3: (0, 0, 255)}  # red
 
 episode_rewards = []
+aggr_episode_rewards = {'ep': [], 'avg': [], 'min': [], 'max': []}
 
-q_table = QTable(SIZE)
+q_table = QTable(SIZE, start_q_table)
+
 for episode in range(HM_EPISODES):
     # Crie os individuos
     player = Entity(SIZE)
@@ -62,7 +65,7 @@ for episode in range(HM_EPISODES):
         player.action(action)
 
         # Mova os outros individuos para introduzir complexidade
-        enemy.move()
+        # enemy.move()
         # door.move()
 
         # Penalidades e recomenpensas
@@ -112,9 +115,22 @@ for episode in range(HM_EPISODES):
 
     episode_rewards.append(episode_reward)
     epsilon *= EPS_DECAY
+    if not episode % SHOW_EVERY:
+        average_reward = sum(episode_rewards[-SHOW_EVERY:]) / len(episode_rewards[-SHOW_EVERY:])
+        aggr_episode_rewards['ep'].append(episode)
+        aggr_episode_rewards['avg'].append(average_reward)
+        aggr_episode_rewards['min'].append(min(episode_rewards[-SHOW_EVERY:]))
+        aggr_episode_rewards['max'].append(max(episode_rewards[-SHOW_EVERY:]))
+        print(f"Episode: {episode} avg: {average_reward} min: {min(episode_rewards[-SHOW_EVERY:])} max: {max(episode_rewards[-SHOW_EVERY:])}")
 
 q_table.make_picke()
 moving_avg = np.convolve(episode_rewards, np.ones((SHOW_EVERY,)) / SHOW_EVERY, mode='valid')
+
+plt.plot(aggr_episode_rewards['ep'], aggr_episode_rewards['avg'], label='avg')
+plt.plot(aggr_episode_rewards['ep'], aggr_episode_rewards['min'], label='min')
+plt.plot(aggr_episode_rewards['ep'], aggr_episode_rewards['max'], label='max')
+plt.legend(loc=4)
+plt.show()
 
 plt.plot([i for i in range(len(moving_avg))], moving_avg)
 plt.ylabel(f"Reward {SHOW_EVERY}ma")

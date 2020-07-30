@@ -15,9 +15,6 @@ env = gym.make('MountainCar-v0')
 # print(env.action_space.n)
 
 LEARNING_RATE = 0.1
-"""
-If my max_future value looks for my new_max_q_value
-"""
 # weight of how important we find future actions over the current action
 DISCOUNT = 0.95
 EPISODES = 2000
@@ -75,7 +72,7 @@ for episode in range(EPISODES):
         else:
             action = np.random.randint(0, env.action_space.n)
         new_state, reward, done, _ = env.step(action)
-        print(new_state)
+        # print(new_state)
 
         episode_reward += reward
 
